@@ -1,12 +1,35 @@
 {
-  "name": "ngx-datatable",
-  "version": "0.0.1",
+  "name": "@christophhu/ngx-datatable",
+  "version": "20.3.0",
+  "description": "Library for Angular to create data tables.",
+  "license": "MIT",
+  "author": {
+    "name": "Christoph Huschenhoefer",
+    "email": "christoph@nxt.codes"
+  },
+  "keywords": [
+    "angular",
+    "datatable"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christophhu/ngx-datatable.git"
+  },
+  "bugs": {
+    "url": "https://github.com/christophhu/ngx-datatable/issues"
+  },
+  "homepage": "https://github.com/christophhu/ngx-datatable#readme",
   "peerDependencies": {
     "@angular/common": "^20.3.0",
-    "@angular/core": "^20.3.0"
+    "@angular/core": "^20.3.0",
+    "@angular/material": "^20.2.11",
+    "@christophhu/ngx-icons": "^20.3.1"
   },
   "dependencies": {
     "tslib": "^2.3.0"
-  },
-  "sideEffects": false
+  }
 }
