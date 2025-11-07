@@ -38,8 +38,24 @@ import { DatatableComponent } from '@christophhu/ngx-datatable';
 })
 ```
 
-```html
+Add the table options and data source in your component.ts file.
+```typescript
+easydata$: Observable<any[]> = of([
+  { date: '01.01.2024 00:00:59', description: 'Berlin', klar: true },
+  { date: '01.01.2023 00:00:59', description: 'Hamburg', klar: false },
+])
+easytable: Tableoptions = {
+  columns: [
+    { id: '1', name: 'date', header: 'Datum/Zeit', cell: 'date', pipe: { name: DatePipe, args: 'dd.MM.yyyy HH:mm:ss'}, hidden: false, sortable: true },
+    { id: '2', name: 'description', header: 'Beschreibung', cell: 'description', hidden: false, sortable: true },
+    { id: '3', name: 'klar', header: 'Klar', cell: 'klar', type: 'checkbox', disabled: true, hidden: false, sortable: true }
+  ]
+}
+```
 
+Then, you can use the `<ngx-datatable>` component in your HTML templates as shown below:
+```html
+<ngx-datatable [tableoptions]="easytable" [data$]="easydata$"></ngx-datatable>
 ```
 
 ## License

@@ -27,8 +27,7 @@
               }
             ],
             "styles": [
-              "projects/demo/src/styles.sass",
-              "projects/ngx-datatable/src/lib/style/ngx-datatable.scss"
+              "projects/demo/src/styles.sass"
             ]
           },
           "configurations": {
