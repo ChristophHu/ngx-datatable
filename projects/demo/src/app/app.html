@@ -1,4 +1,3 @@
-<!-- <ngx-datatable [data$]="data$" [table]="table"></ngx-datatable> -->
 <div class="absolute overflow-hidden inset-0 p-4 pb-0 bottom-16">
   <div class="flex flex-col mb-4 overflow-y-auto scrollbar-hide">
     <div class="flex flex-row p-4 justify-between bg-tertiary border-b border-borderline rounded-t-lg z-10">
@@ -9,22 +8,9 @@
     </div>
 
     <div class="relative flex-auto w-full overflow-y-auto scrollbar-hide">
-      <!-- @defer (when isVisible; prefetch on timer(1000ms)) { -->
         <div class="bg-tertiary">
-          <ngx-datatable [tableoptions]="easytable" [data$]="easydata$"></ngx-datatable>
+          <ngx-datatable [tableoptions]="easytable" [data$]="easydata$"></ngx-datatable> 
         </div>
-      <!-- }
-      @placeholder (minimum 100ms) {
-        <div class="flex w-full p-2 bg-tertiary justify-center" *ngIf="isSpinnerVisible">
-          <circular-spinner></circular-spinner>
-        </div>
-      }
-      @loading (after 100ms; minimum 150ms) {
-        <div class="h-4 bg-tertiary">Loading</div>
-      }
-      @error {
-        <div class="h-4 bg-tertiary">Error</div>
-      } -->
       <div class="debug-item-hide bg-tertiary text-dark text-xs border-t border-borderline">
         <pre class="p-2 bg-gradient-45 to-gray-600">{{ (easydata$ | async) | json }}</pre>
       </div>

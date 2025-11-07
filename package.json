@@ -31,6 +31,7 @@
     "@angular/material": "^20.2.11",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
+    "@christophhu/ngx-datatable": "^20.3.0",
     "@christophhu/ngx-icons": "^20.3.1",
     "@tailwindcss/postcss": "^4.1.16",
     "postcss": "^8.5.6",

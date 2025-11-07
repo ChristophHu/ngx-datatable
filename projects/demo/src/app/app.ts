@@ -1,12 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
-import { DatatableComponent } from '../../../ngx-datatable/src/lib/components/datatable/datatable.component'
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs'
-import { Tableoptions } from '../../../ngx-datatable/src/lib/models/tableoptions.model'
 import { AsyncPipe, DatePipe, JsonPipe } from '@angular/common'
-import { DatatableService } from '../../../ngx-datatable/src/lib/services/datatable.service'
-import { ExpandTemplateService } from '../../../ngx-datatable/src/lib/services/expand-template.service'
-import { TableActionReturn } from '../../../ngx-datatable/src/lib/models/tableaction.model'
-import { TableActionEnum } from '../../../ngx-datatable/src/lib/models/tableaction.enum'
+import { DatatableComponent, DatatableService, ExpandTemplateService, TableActionReturn, TableActionEnum, Tableoptions } from '@christophhu/ngx-datatable'
 import { IconsComponent } from '@christophhu/ngx-icons'
 import { MatMenuModule } from '@angular/material/menu'
 
