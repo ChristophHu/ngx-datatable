@@ -1,13 +1,18 @@
-import { AfterViewInit, Component, Input, ViewChild } from '@angular/core'
-import { AsyncPipe, JsonPipe, NgClass } from '@angular/common'
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core'
+import { AsyncPipe, JsonPipe, NgClass, NgTemplateOutlet } from '@angular/common'
 import { IconsComponent } from '@christophhu/ngx-icons'
 import { MatMenuModule } from '@angular/material/menu'
 import { MatSort, MatSortable, MatSortModule } from '@angular/material/sort'
 import { MatTableDataSource, MatTableModule } from '@angular/material/table'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { BehaviorSubject, Observable, of } from 'rxjs'
 import { Tableoptions } from '../../models/tableoptions.model'
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator'
 import { DynamicPipe } from '../../pipes/dynamic/dynamic.pipe'
+import { DatatableService } from '../../services/datatable.service'
+import { ExpandTemplateService } from '../../services/expand-template.service'
+import { TableActionReturn } from '../../models/tableaction.model'
+import { TableActionEnum } from '../../models/tableaction.enum'
+import { MobilePaginationDirective } from '../../directives/mobile-pagination/mobile-pagination.directive'
 
 @Component({
   selector: 'ngx-datatable',
@@ -15,70 +20,112 @@ import { DynamicPipe } from '../../pipes/dynamic/dynamic.pipe'
     AsyncPipe,
     DynamicPipe,
     IconsComponent,
-    JsonPipe,
+    // JsonPipe,
     MatMenuModule,
     MatPaginatorModule,
     MatSortModule,
     MatTableModule,
-    NgClass
+    NgClass,
+    NgTemplateOutlet,
+    MobilePaginationDirective
   ],
   templateUrl: './datatable.component.html',
   styleUrl: './datatable.component.sass',
 })
-export class DatatableComponent implements AfterViewInit {
-  @Input() table!: Tableoptions
+export class DatatableComponent implements OnInit {
+  @Input() tableoptions!: Tableoptions
   @Input() data$!: Observable<any[]>
+  @Input() isEditableInTable: boolean = false
+  @Input() pageSize: number = 10
+  @Output() action: EventEmitter<TableActionReturn> = new EventEmitter<TableActionReturn>()
 
-  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator | null
+  // expandable
+  // columnsToDisplayWithExpand = ['expand']
+  expandedElement: any
+
+  /**
+   * @description default class of NgxDynamicTableComponent
+   * @memberof NgxDynamicTableComponent
+   */
+  paginator!: MatPaginator
+  @ViewChild(MatPaginator) set _paginator(paginator: MatPaginator) {
+    this.paginator = paginator
+    this.dataSource.paginator = this.paginator
+  }
   @ViewChild(MatSort) sort!: MatSort
-  
-  private readonly _changePaginator = new BehaviorSubject<boolean>(false)
+
+  private readonly _changePaginator = new BehaviorSubject<boolean>(false) 
   changePaginator$: Observable<boolean> = this._changePaginator.asObservable()
 
   dataSource: any
+  pageSizeOptions: number[] = [1, 5, 10, 15, 20, 50, 100]
+  isEditable$: Observable<boolean> = of(false)
+  isInitialized: boolean = false
 
-  pageSize: number = 20
-  pageSizeOptions: number[] = [5, 10, 15, 20, 50, 100]
-
-  constructor() {
+  constructor(private _datatableService: DatatableService, private _expandTemplateService: ExpandTemplateService) {
     this.dataSource = new MatTableDataSource([])
+    this.isEditable$ = this._datatableService.isEditable$
   }
-  ngAfterViewInit(): void {
-    console.log(this.table)
+  
+  ngOnInit(): void {
     this.data$.subscribe({
       next: (data: any[]) => {  
+        // console.log('data', data)
         if (data && data.length > 0) {
           setTimeout(() => {
-            if (this.table.showPaginator && this.paginator) {
+            this.setTableColumnNames(data[0])
+            if (this.tableoptions.paginator && this.paginator) {
               this.paginator._intl.itemsPerPageLabel = 'Elemente pro Seite'
               this.paginator._intl.nextPageLabel = 'Nächste'
               this.paginator._intl.previousPageLabel = 'Vorherige'
               this.paginator._intl.getRangeLabel = this.getRangeLabel
               this.dataSource.paginator = this.paginator
             }
-  
-            if (this.table.sortColumn && this.table.sortStart) {
-              this.sort.sort(({ id: this.table.sortColumn, start: this.table.sortStart }) as MatSortable)
+            
+            if (this.tableoptions.sortColumn && this.tableoptions.sortStart && !this.isInitialized) {
+              if (this.sort != undefined) this.sort.sort(({ id: this.tableoptions.sortColumn, start: this.tableoptions.sortStart }) as MatSortable)
             }
             this.dataSource.sort = this.sort
             this.dataSource.data = data
+
+            // ToDo: date is hardcoded!
+            this.dataSource.sortingDataAccessor = (item: any, property: any) => {
+              switch (property) {
+                 case 'date': 
+                  return new Date(item.date)
+                 default: 
+                  return item[property]
+              }
+            }
   
             this.dataSource.filterPredicate = (data: any, filter: string) => {
               let match: boolean = false
-              this.table.columnFilter.forEach((element: string) => {
-                match = (match || data[element].trim().toLowerCase().includes(filter)) // fehler, wenn bei klarmeldungen nach "tr" gefiltert wird
+              this.tableoptions.columnFilter?.forEach((element: string) => {
+                match = (match || data[element].trim().toLowerCase().includes(filter)) // ToDo: error on filter "tr" in klarmeldung
               })
               return match
             }
   
-            // this._dynamicTableService.textFilter$.subscribe((data) => this.textfilter(data))
-          }, 10)
+            this._datatableService.textFilter$.subscribe((data) => this.textfilter(data))
+            this.isInitialized = true
+          }, 20)
         }
       },
-      error(err: any) {
+      error(err) {
         console.log(err)
       }
     })
+  }
+
+  setTableColumnNames(data: any): void {
+    if (!this.tableoptions.columnNames) this.tableoptions.columnNames = Object.keys(data)
+    if (this.tableoptions.checkbox) this.tableoptions.columnNames = ['checkbox', ...this.tableoptions.columnNames]
+    if (this.tableoptions.count) this.tableoptions.columnNames = ['count', ...this.tableoptions.columnNames]
+    if (this.tableoptions.unread) this.tableoptions.columnNames = ['unread', ...this.tableoptions.columnNames]
+    if (this.tableoptions.sortRowManual) this.tableoptions.columnNames = ['sortrow', ...this.tableoptions.columnNames]
+    if (this.tableoptions.isExpandable) this.tableoptions.columnNames = [...this.tableoptions.columnNames, 'expand']
+    if (this.tableoptions.actions) this.tableoptions.columnNames = [...this.tableoptions.columnNames, 'actions']
+    this.tableoptions.columnNames = [...new Set(this.tableoptions.columnNames)]
   }
 
   getRangeLabel = (page: number, pageSize: number, length: number): string => {
@@ -97,22 +144,76 @@ export class DatatableComponent implements AfterViewInit {
     this._changePaginator.next(true)
   }
 
-  /**
-   * Retry loading data in case of error
-   */
-  retry(): void {
-    // Implement retry logic here
-    // For example: reload data, trigger refresh, etc.
-    console.log('Retrying data load...');
+  isSticky(id: string) {
+    const buttonToggleGroup: string[] = ['checkbox', 'count', 'name']
+    return (buttonToggleGroup || []).indexOf(id) !== -1
   }
 
-  isSticky(id: string) {
-    const buttonToggleGroup: string[] = ['count', 'name']
-    return (buttonToggleGroup || []).indexOf(id) !== -1;
+  expand(el: any) {
+    this.expandedElement = this.expandedElement === el ? null : el
   }
-  show(id: string) {
-    // fehler
-    // let action: ActionEnum = 4
-    // this.action.emit({ id, action })
+  getExpandTemplate(temp: string): TemplateRef<any> {
+    return this._expandTemplateService.get(temp)
+  }
+
+  /**
+   * Set the datasource.filter to filter in table.
+   *
+   * @param filterText - Text to filter in table.
+   */
+  public textfilter(filterText: string = 'test') {
+    this.dataSource.filter = filterText.trim().toLowerCase()
+  }
+
+  /**
+   * This function returns to returnTableAction by using @Output().
+   * @param {string}  id - element.id.
+   * @param {enum}    action - action enum.
+   * 
+   * @example
+   * <button mat-menu-item class="!flex items-center" (click)="clickAction(element.id, action.action)">
+   */
+  clickAction(id: string, action: TableActionEnum) {
+    this.action.emit({ id, action })
+  }
+
+  /**
+   * Emits a corresponding event to create a new row.
+   */
+  create() {
+    this.action.emit({ id: '', action: TableActionEnum.CREATE })
+  }
+  /**
+   * Emits a corresponding event to edit a row.
+   * @param {string} row - The selected row.
+   */
+  edit(row: any) {
+    if (!this.isEditableInTable) this.action.emit({ row, action: TableActionEnum.EDIT })
+  }
+  /**
+   * Emits a corresponding event to delete a row.
+   * @param {string} row - The selected row.
+   */
+  delete(row: any) {
+    this.action.emit({ row, action: TableActionEnum.DELETE })
+  }
+  /**
+   * Emits a corresponding event to check a row.
+   * @param {string} row - The checked row.
+   */
+  check(row: any) {
+    this.action.emit({ row, action: TableActionEnum.CHECK })
+  }
+  /**
+   * Emits a corresponding event to check all rows.
+   */
+  checkAll() {
+    this.action.emit({ action: TableActionEnum.CHECKALL })
+  }
+  /**
+   * Emits a corresponding event to refresh the table.
+   */
+  refresh() {
+    this.action.emit({ action: TableActionEnum.REFRESH })
   }
 }

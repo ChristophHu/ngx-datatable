@@ -8,5 +8,6 @@ export interface TableAction {
 
 export interface TableActionReturn {
     action  : TableActionEnum,
-    id      : string
+    id?     : string
+    row?    : any
 }

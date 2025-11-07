@@ -1,5 +1,16 @@
+/**
+ * This enumeration defines all options that will return from table.
+ * @enum
+ */
 export enum TableActionEnum {
-    DELETE  = 0,
-    EDIT    = 1,
-    SHOW    = 2
+    CREATE = 0,
+    DELETE = 1,
+    EDIT = 2,
+    SHOW = 4,
+    REFRESH = 8,
+    CHECK,
+    CHECKALL = 128,
+    QRCODE = 16,
+    TANK = 32,
+    CHECKLIST = 64
 }
