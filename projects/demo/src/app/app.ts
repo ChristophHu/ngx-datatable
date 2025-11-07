@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { DatatableComponent } from '../../../ngx-datatable/src/lib/components/datatable.component/datatable.component'
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs'
 import { Tableoptions } from '../../../ngx-datatable/src/lib/models/tableoptions.model'
-import { DatePipe } from '@angular/common'
+import { AsyncPipe, DatePipe, JsonPipe } from '@angular/common'
 import { DatatableService } from '../../../ngx-datatable/src/lib/services/datatable.service'
 import { ExpandTemplateService } from '../../../ngx-datatable/src/lib/services/expand-template.service'
 import { TableActionReturn } from '../../../ngx-datatable/src/lib/models/tableaction.model'
@@ -13,8 +13,10 @@ import { MatMenuModule } from '@angular/material/menu'
 @Component({
   selector: 'app-root',
   imports: [
+    AsyncPipe,
     DatatableComponent,
     IconsComponent,
+    JsonPipe,
     MatMenuModule
   ],
   templateUrl: './app.html',
@@ -74,7 +76,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   ])
   easytable: Tableoptions = {
     columns: [
-      { id: '1', name: 'date', header: 'Datum/Zeit', cell: 'date', pipe: { name: DatePipe, args: 'dd.MM.YYYY HH:mm:ss'}, hidden: false, sortable: true },
+      { id: '1', name: 'date', header: 'Datum/Zeit', cell: 'date', pipe: { name: DatePipe, args: 'dd.MM.yyyy HH:mm:ss'}, hidden: false, sortable: true },
       { id: '2', name: 'description', header: 'Beschreibung', cell: 'description', hidden: false, sortable: true },
       { id: '3', name: 'klar', header: 'Klar', cell: 'klar', type: 'checkbox', disabled: true, hidden: false, sortable: true }
     ]
@@ -89,7 +91,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     columns: [
       { id: '1', name: 'id', header: 'ID', cell: 'id', hidden: true, sortable: true },
       { id: '2', name: 'name', header: 'Name', cell: 'name', hidden: false, sortable: true },
-      { id: '3', name: 'date', header: 'Datum/Zeit', cell: 'date', pipe: { name: DatePipe, args: 'dd.MM.YYYY HH:mm:ss'}, hidden: false, sortable: true },
+      { id: '3', name: 'date', header: 'Datum/Zeit', cell: 'date', pipe: { name: DatePipe, args: 'dd.MM.yyyy HH:mm:ss'}, hidden: false, sortable: true },
       { id: '4', name: 'ort', header: 'Ort', cell: 'ort', hidden: false, sortable: true },
     ],
     columnFilter: ['name', 'date', 'ort', 'description'],
@@ -111,27 +113,18 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   returnTableAction(event: TableActionReturn) {
     switch (event.action) {
       case TableActionEnum.DELETE:
-        // console.log('delete row', event)
         this.deleteRow(event.id!)
-        // setTimeout(() => {
-        //   // this.deleteRow(event.id!)
-        // , 2000 })
         break
       case TableActionEnum.EDIT:
-        // console.log('edit row')
         break
       case TableActionEnum.SHOW:
-        // console.log('show row')
         break
       case TableActionEnum.REFRESH:
-        // console.log('refresh table')
         this.setData()
         break
       case TableActionEnum.CHECK:
-        // console.log('check row', event.row)
         break
       case TableActionEnum.CHECKALL:
-        // console.log('check all rows')
         this.isCheckedAll = !this.isCheckedAll
         this._data.value.forEach((row: any) => {
           row.checked = this.isCheckedAll

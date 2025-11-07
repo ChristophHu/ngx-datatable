@@ -3,6 +3,26 @@
 @use './app/core/corporate/theme.sass'
 
 *
+    -webkit-user-select: none
+    -khtml-user-select: none
+    -moz-user-select: none
+    -ms-user-select: none
+    user-select: none
+
+.scrollbar-hide
+    -ms-overflow-style: none
+    scrollbar-width: none
+    overflow-y: scroll
+
+    &::-webkit-scrollbar
+        display: none
+        width: 0
+        height: 0
+
+body
+    @apply bg-blue-900 text-dark
+
+*
     @apply ring-0 ring-offset-0 outline-none
 
 .mat-column-unread
@@ -26,7 +46,6 @@
     button
         @apply mx-auto
 
-
 .mat-mdc-table
     @apply bg-transparent 
 
@@ -46,19 +65,25 @@
     @apply bg-tertiary text-dark 
 
 .mat-mdc-cell
-    @apply border-t border-light 
+    @apply border-t border-light
+
+.mat-mdc-menu-panel
+    @apply bg-light text-dark
+
+.mat-mdc-menu-content
+    @apply bg-light text-dark
 
 .nxt-bubble-container
     @apply flex
 
 .nxt-bubble
-    @apply flex h-16 w-16 items-center justify-center bg-gray-500 text-darker rounded-full cursor-pointer transition duration-300
+    @apply flex h-12 w-12 mx-1 items-center justify-center bg-gray-500 text-darker rounded-full cursor-pointer transition duration-300
 
 .nxt-bubble:hover
     @apply bg-dark text-darker
 
 .nxt-bubble__active
-    @apply bg-dark text-darker
+    @apply bg-accent text-darker
 
 .nxt-bubble__disabled
     @apply bg-disabled text-darker cursor-default pointer-events-none
@@ -84,7 +109,6 @@ mat-paginator
 .paginator .ngx-pagination a:hover, .ngx-pagination button:hover
 
 .paginator .ngx-pagination a:focus, .ngx-pagination button:focus
-
 
 tr.example-detail-row
   height: 0
