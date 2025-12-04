@@ -30,7 +30,7 @@ import { MobilePaginationDirective } from '../../directives/mobile-pagination/mo
     MobilePaginationDirective
   ],
   templateUrl: './datatable.component.html',
-  styleUrl: './datatable.component.sass',
+  styleUrls: ['./datatable.component.sass', '../../styles/ngx-datatable.sass']
 })
 export class DatatableComponent implements OnInit {
   @Input() tableoptions!: Tableoptions

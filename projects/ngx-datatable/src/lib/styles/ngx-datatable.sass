@@ -82,9 +82,33 @@ mat-paginator
     padding-left: 9px
     padding-right: 9px
 
-.paginator .ngx-pagination a:hover, .ngx-pagination button:hover
+// .paginator .ngx-pagination a:hover, .ngx-pagination button:hover
 
-.paginator .ngx-pagination a:focus, .ngx-pagination button:focus
+// .paginator .ngx-pagination a:focus, .ngx-pagination button:focus
 
 tr.example-detail-row
   height: 0
+
+// Table row animations
+.table-row-enter
+  animation: fadeInUp 0.3s ease-out forwards
+  opacity: 0
+
+@keyframes fadeInUp
+  from
+    opacity: 0
+  to
+    opacity: 1
+
+.expandable-wrapper
+  display: grid
+  grid-template-rows: 0fr
+  opacity: 0
+  transition: grid-template-rows 0.3s ease-out, opacity 0.3s ease-out
+  
+  &.expanded
+    grid-template-rows: 1fr
+    opacity: 1
+
+.expandable-content
+  overflow: hidden
